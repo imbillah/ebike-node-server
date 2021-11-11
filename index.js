@@ -24,6 +24,7 @@ const run = async () => {
     const productCollection = database.collection("products");
     const userCollection = database.collection("users");
     const reviewCollection = database.collection("reviews");
+    const orderCollection = database.collection("orders");
 
     //  sending product data to DB
     app.post("/products", async (req, res) => {
@@ -51,7 +52,20 @@ const run = async () => {
     // sending user info to DB
     app.post("/users", async (req, res) => {
       const newUser = req.body;
-      const result = userCollection.insertOne(newUser);
+      const result = await userCollection.insertOne(newUser);
+      res.send(result);
+    });
+    // Loading single product by id
+    app.get("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const product = await productCollection.findOne(query);
+      res.send(product);
+    });
+    // sending user oder data to DB
+    app.post("/orders", async (req, res) => {
+      const newOrder = req.body;
+      const result = await orderCollection.insertOne(newOrder);
       res.send(result);
     });
   } finally {
