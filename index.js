@@ -68,6 +68,41 @@ const run = async () => {
       const result = await orderCollection.insertOne(newOrder);
       res.send(result);
     });
+    // Loading order data by user email
+    app.get("/myorders/:email", async (req, res) => {
+      const result = await orderCollection
+        .find({
+          email: req.params.email,
+        })
+        .toArray();
+      res.send(result);
+    });
+    // delete specific user order
+    app.delete("/orders/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await orderCollection.deleteOne(query);
+      res.send(result);
+    });
+    // adding admin role to user collection
+    app.put("/users/admin", async (req, res) => {
+      const user = req.body;
+      const filter = { email: user.email };
+      const makeAdmin = { $set: { role: "admin" } };
+      const result = await userCollection.updateOne(filter, makeAdmin);
+      res.send(result);
+    });
+    // checking user role as admin
+    app.get("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      let isAdmin = false;
+      if (user?.role === "admin") {
+        isAdmin = true;
+      }
+      res.send({ admin: isAdmin });
+    });
   } finally {
   }
 };
