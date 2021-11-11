@@ -22,6 +22,8 @@ const run = async () => {
     await client.connect();
     const database = client.db("Ebike");
     const productCollection = database.collection("products");
+    const userCollection = database.collection("users");
+    const reviewCollection = database.collection("reviews");
 
     //  sending product data to DB
     app.post("/products", async (req, res) => {
@@ -34,6 +36,23 @@ const run = async () => {
     app.get("/products", async (req, res) => {
       const products = await productCollection.find({}).toArray();
       res.send(products);
+    });
+    // sending user review to DB
+    app.post("/reviews", async (req, res) => {
+      const newReview = req.body;
+      const result = await reviewCollection.insertOne(newReview);
+      res.send(result);
+    });
+    // getting review data
+    app.get("/reviews", async (req, res) => {
+      const reviews = await reviewCollection.find({}).toArray();
+      res.send(reviews);
+    });
+    // sending user info to DB
+    app.post("/users", async (req, res) => {
+      const newUser = req.body;
+      const result = userCollection.insertOne(newUser);
+      res.send(result);
     });
   } finally {
   }
