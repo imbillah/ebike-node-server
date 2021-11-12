@@ -68,6 +68,11 @@ const run = async () => {
       const result = await orderCollection.insertOne(newOrder);
       res.send(result);
     });
+    // Loading user order from DB
+    app.get("/orders", async (req, res) => {
+      const userOrders = await orderCollection.find({}).toArray();
+      res.send(userOrders);
+    });
     // Loading order data by user email
     app.get("/myorders/:email", async (req, res) => {
       const result = await orderCollection
@@ -102,6 +107,23 @@ const run = async () => {
         isAdmin = true;
       }
       res.send({ admin: isAdmin });
+    });
+    // updating status of order
+    app.put("/orders/:id", async (req, res) => {
+      const filter = { _id: ObjectId(req.params.id) };
+      const result = await orderCollection.updateOne(filter, {
+        $set: {
+          status: req.body.status,
+        },
+      });
+      res.send(result);
+    });
+    // deleting user orders
+    app.delete("/orders/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await orderCollection.deleteOne(query);
+      res.send(result);
     });
   } finally {
   }
